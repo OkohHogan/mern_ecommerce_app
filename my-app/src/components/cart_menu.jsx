@@ -1,14 +1,11 @@
 import FeatherIcon from "feather-icons-react/build/FeatherIcon";
 import React, {useState, useEffect} from "react";
-import { Col, Row, Form } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Col, Row, Form, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "./loader";
 
-const closeCart = event => {
-    const addClass = document.querySelector(".cart_toggle");
-    const overLay = document.querySelector(".overlay_bg");
-    addClass.classList.remove("active");
-    overLay.style.display = "none";
-  };
+
+
 
   const FetchCartItem = (props) => {
     return(
@@ -65,9 +62,11 @@ const closeCart = event => {
 
 const CartBar = () => {
     const [records, setRecords] = useState([]);
+    const [isLoading, SetIsLoading] = useState(false);
     useEffect(() => {
      async function getRecords() {
-       const response = await fetch(`http://localhost:5050/cartItems`); 
+      SetIsLoading(true);
+       const response = await fetch(`https://nelly-ecommerce-app.onrender.com/cartItems`); 
        if (!response.ok) {
          const message = `An error occurred: ${response.statusText}`;
          window.alert(message);
@@ -76,6 +75,7 @@ const CartBar = () => {
        if(response.ok) { 
          const records = await response.json();
          setRecords(records);
+         SetIsLoading(false)
        }
      }
      getRecords();
@@ -85,7 +85,7 @@ const CartBar = () => {
    const [subData, getSubData] = useState([]);
    useEffect(() => {
     async function getData() {
-      const response = await fetch(`http://localhost:5050/cartItems`); 
+      const response = await fetch(`https://nelly-ecommerce-app.onrender.com/cartItems`); 
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         window.alert(message);
@@ -104,7 +104,7 @@ const CartBar = () => {
    const [number, setNumber] = useState([]);
    useEffect(() => {
     async function getNumber() {
-      const response = await fetch(`http://localhost:5050/cartCounter`); 
+      const response = await fetch(`https://nelly-ecommerce-app.onrender.com/cartCounter`); 
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         window.alert(message);
@@ -120,7 +120,7 @@ const CartBar = () => {
   }, [number.length]);
 
    async function deleteRecord(id) {
-    await fetch(`http://localhost:5050/delCartItem/${id}`, {
+    await fetch(`https://nelly-ecommerce-app.onrender.com/delCartItem/${id}`, {
     method: "DELETE"
     });
     const newRecords = records.filter((el) => el._id !== id);
@@ -142,6 +142,22 @@ const CartBar = () => {
         });
       }
 
+    const navigate = useNavigate();
+    const closeCart = event => {
+        const addClass = document.querySelector(".cart_toggle");
+        const overLay = document.querySelector(".overlay_bg");
+        addClass.classList.remove("active");
+        overLay.style.display = "none";
+      };
+
+      const redirectCart = event => {
+        const addClass = document.querySelector(".cart_toggle");
+        const overLay = document.querySelector(".overlay_bg");
+        addClass.classList.remove("active");
+        overLay.style.display = "none";
+        navigate("/cart");
+      };
+
     return (
         <>
     <div className="cart_toggle">
@@ -162,7 +178,7 @@ const CartBar = () => {
 
    <div className="cart_toggle_body wish_list">
     <div className="items_box">
-        {recordList()}
+        { isLoading ? <LoadingSpinner /> : recordList()}
    
         <div className="cart_data_box">
             <div className="text_box">
@@ -191,7 +207,7 @@ const CartBar = () => {
 
           <div className="checkout_btn">
             <form action="" method="post">
-                <Link to="/cart" className="btn form-control">View Bag</Link>
+                <Button onClick={redirectCart} className="btn form-control">View Bag</Button>
             </form>
           </div>
     </div>

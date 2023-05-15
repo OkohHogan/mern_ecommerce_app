@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import MainNav  from "./components/nav";
 import Footer from "./components/footer";
@@ -20,6 +20,7 @@ import Error from "./components/error";
 
 const  App = ()  => {
   const isLoggedIn = window.localStorage.getItem("loggedIn");
+
   return (
    <>
    <Router>

@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import { Col, Row, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import FeatherIcon from "feather-icons-react/build/FeatherIcon";
+import LoadingSpinner from "./loader";
 
 
 const FetchCartItem = (props) => {
@@ -18,7 +19,7 @@ const FetchCartItem = (props) => {
                                     <div className="text_box">
                                         <div className="">
                                             <div className="cost float-end">
-                                                <span className="price">${props.price}</span>
+                                              
                                                 <button className="btn"
                                                 onClick={() => {
                                                 props.deleteRecord(props._id);
@@ -30,16 +31,16 @@ const FetchCartItem = (props) => {
                                             <div className="heading">
                                             <Link to={`/product/${props.id}`}>
                                             <h2>{props.title}</h2>
+                                            <span className="price">${props.price}</span>
                                             </Link>
                                             </div>
                                         </div>
                                         <div className="details">
                                             {/* <p>Color: Brown</p> */}
-                                            <p>In-stock</p>
-                                        </div>
-                                          <Form onSubmit={handleSubmit}>
+                                            {/* <p>In-stock</p> */}
+                                            <Form onSubmit={handleSubmit}>
                                           <Row className="mb-3 mt-3">
-                                          <Col sm={3} xs={3}>
+                                          <Col sm={4} xs={5}>
                                           <Form.Select name="qty"  onChange={handleSubmit}>
                                           <option value="1" >1</option>
                                           <option value="2">2</option>
@@ -53,6 +54,8 @@ const FetchCartItem = (props) => {
                                           </Col>
                                           </Row>
                                           </Form>
+                                        </div>
+                                       
                                     </div>
                                 </Col>
                             </Row>
@@ -69,9 +72,11 @@ const handleSubmit = (e) => {
 const CartData = () => {
 
     const [records, setRecords] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
      async function getRecords() {
-       const response = await fetch(`http://localhost:5050/cartItems`); 
+      setIsLoading(true);
+       const response = await fetch(`https://nelly-ecommerce-app.onrender.com/cartItems`); 
        if (!response.ok) {
          const message = `An error occurred: ${response.statusText}`;
          window.alert(message);
@@ -80,6 +85,7 @@ const CartData = () => {
        if(response.ok) {
          const records = await response.json();
          setRecords(records);
+         setIsLoading(false);
        }
      }
      getRecords();
@@ -87,7 +93,7 @@ const CartData = () => {
    }, [records.length]);
 
    async function deleteRecord(id) {
-    await fetch(`http://localhost:5050/delCartItem/${id}`, {
+    await fetch(`https://nelly-ecommerce-app.onrender.com/delCartItem/${id}`, {
     method: "DELETE"
     });
     const newRecords = records.filter((el) => el._id !== id);
@@ -97,7 +103,7 @@ const CartData = () => {
     const [subData, getSubData] = useState([]);
     useEffect(() => {
      async function getData() {
-       const response = await fetch(`http://localhost:5050/cartItems`); 
+       const response = await fetch(`https://nelly-ecommerce-app.onrender.com/cartItems`); 
        if (!response.ok) {
          const message = `An error occurred: ${response.statusText}`;
          window.alert(message);
@@ -116,7 +122,7 @@ const CartData = () => {
    const [number, setNumber] = useState([]);
    useEffect(() => {
     async function getNumber() {
-      const response = await fetch(`http://localhost:5050/cartCounter`); 
+      const response = await fetch(`https://nelly-ecommerce-app.onrender.com/cartCounter`); 
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         window.alert(message);
@@ -153,10 +159,10 @@ const CartData = () => {
             </div>
             <div className="items_box">
                    <Row>
-                      <Col xs={8} lg={8} sm={8} md={8} xl={8} xxl={8}>
-                        {recordList()}
+                      <Col xs={12} lg={8} sm={12} md={8} xl={8} xxl={8}>
+                        { isLoading ? <LoadingSpinner /> : recordList()}
                        </Col>
-                        <Col xs={4} lg={4} sm={4} md={4} xl={4} xxl={4}>
+                        <Col xs={12} lg={4} sm={12} md={4} xl={4} xxl={4}>
                               <div className="cart_data_box">
                                 <div className="text_box">
                                    <div className="heading">

@@ -7,7 +7,7 @@ function Signin() {
     return (
         <Container fluid className="signup">
             <Row>
-                <Col xs={12} lg={4} sm={6} md={4} xl={4} xxl={4}></Col>
+                <Col xs={12} lg={4} sm={3} md={4} xl={4} xxl={4}></Col>
                 <Col xs={12} lg={4} sm={6} md={4} xl={4} xxl={4}>
                 <div className="box">
                         <div className="tab_list ">
@@ -37,7 +37,7 @@ function Signin() {
                         </div>
                     </div>
                 </Col>
-                <Col xs={12} lg={4} sm={6} md={4} xl={4} xxl={4}></Col>
+                <Col xs={12} lg={4} sm={3} md={4} xl={4} xxl={4}></Col>
             </Row>
         </Container>
 

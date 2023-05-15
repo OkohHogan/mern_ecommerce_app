@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {Button, Form, Row, Col} from 'react-bootstrap/';
 import { useNavigate } from "react-router-dom";
+import AlertModal from "./alertModal";
 
 const SignUpForm = () => {
 
@@ -11,7 +12,8 @@ const SignUpForm = () => {
     phone: "",
     password: "",
   });
-
+  const [modalData, setModaldata] = useState({titleData:"", descData:""});
+  const [modalShow, setModalShow] = useState(false);
  function updateForm(value) { 
   return setForm((prev) => {
     return { ...prev, ...value };
@@ -21,7 +23,7 @@ const SignUpForm = () => {
  async function userSignup(e) {
   e.preventDefault();
   const newItem = { ...form };
-  await fetch("http://localhost:5050/register", {
+  await fetch("https://nelly-ecommerce-app.onrender.com/register", {
     method: "POST",
     crossDomain: true,
     headers: {
@@ -34,7 +36,12 @@ const SignUpForm = () => {
   .then((res) => res.json())
   .then((data) => {
     if(data === "error") {
-      window.alert("User already exist");
+      setModalShow(true)
+     // window.alert("User already exist");
+      setModaldata({
+        titleData: "Error",
+        descData: "User already exist.",
+      }); 
     } 
     else {
       setForm({ 
@@ -43,12 +50,18 @@ const SignUpForm = () => {
         phone: "",
         password: "",
       })
-      navigate("/signin")
+      navigate("/signin");
+      setModalShow(true);
+      setModaldata({
+        titleData: "Successful",
+        descData: "Your account has been successfully created.",
+      }); 
     }
   })
 }
 
   return (
+    <>
     <Form>
      <Form.Group className="mb-3" controlId="formBasicName">
         <Form.Label>Name</Form.Label>
@@ -105,6 +118,14 @@ const SignUpForm = () => {
       </Button>
         </Form.Group>
     </Form>
+
+    <AlertModal 
+       show={modalShow}
+      title={modalData.titleData}
+      desc={modalData.descData}
+      onHide={() => setModalShow(false)}
+    />
+    </>
   );
 }
 

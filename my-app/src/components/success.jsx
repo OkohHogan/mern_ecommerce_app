@@ -11,7 +11,7 @@ const Success = () => {
   const [record, setRecord] = useState({email: "", username: ""});
   useEffect(() =>{
     function getUser() {
-      fetch("http://localhost:5050/success", {
+      fetch("https://nelly-ecommerce-app.onrender.com/success", {
       method: "POST",
       crossDomain: true,
       headers: {

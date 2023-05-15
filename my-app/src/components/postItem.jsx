@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import {Button, Form, Container, Row, Col} from 'react-bootstrap/';
 import { useNavigate } from "react-router";
+import LoadingAnim from "./loadinganim";
 
 const PostItems = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({title: "", price: "", description: ""});
+  const [form, setForm] = useState({title: "", price: "", description: "", category: "", color: ""});
   const [upFile, setUpFile] = useState()
-
+  const [loadingAnim, setLoadingAnim] = useState(false);
  function updateForm(value) { 
   return setForm((prev) => {
     return { ...prev, ...value };
@@ -21,28 +22,30 @@ const fileUpload = async (e) => {
 
  async function onSubmit(e) {
   e.preventDefault();
- 
+  setLoadingAnim(true)
   const fileInput = { upFile };
   const newItem = { ...form, ...fileInput };
-  // console.log(newItem);
-  await fetch("http://localhost:5050/items/add", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(newItem),
-  })
-  .catch(error => {
-    window.alert(error);
-    return;
-  });
-  setForm({ title: "", price: "", description: "" });
-  setUpFile({ upFile: "" });
-  navigate("/post");
+  const result = await fetch(
+    'https://nelly-ecommerce-app.onrender.com/items/add', {
+        method: "POST",
+        body: JSON.stringify(newItem),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })  
+    result = await result.json();     
+    if (result) {        
+        alert("Data saved succesfully");
+        setForm({ title: "", price: "", description: "",  category: "", color: "" });
+        setUpFile({ upFile: "" });
+        navigate("/post");
+        setLoadingAnim(false);
+    }
+    if(!result) {
+      console.warn(result);
+      alert("Error");
+    }
 }
-
-
-
   return (
     <>
       <Container fluid className="mt-5">
@@ -54,7 +57,7 @@ const fileUpload = async (e) => {
         <Form.Label>Title</Form.Label>
         <Form.Control 
         type="text" 
-        placeholder="Louis Vutton"   
+        placeholder="E.g. Louis Vutton"   
         value={form.title}
         onChange={(e) => updateForm({ title: e.target.value })} />
       </Form.Group>
@@ -63,9 +66,36 @@ const fileUpload = async (e) => {
         <Form.Label>Price</Form.Label>
         <Form.Control  
         type="number" 
-        placeholder="3,000"   
+        placeholder="E.g. 3,000"   
         value={form.price}
         onChange={(e) => updateForm({ price: e.target.value })} />
+      </Form.Group>
+
+      <Form.Group className="mb-3  " controlId="formBasicPassword">
+        <Form.Label>Upload Image</Form.Label>
+        <Form.Control 
+        type="file" 
+        name="imgFile" 
+        accept=".jpeg, .png, .jpg, .webp"
+        onChange={fileUpload} />
+      </Form.Group>
+
+      <Form.Group className="mb-3 " controlId="formBasicPassword">
+        <Form.Label>Category</Form.Label>
+        <Form.Control  
+        type="text" 
+        placeholder="E.g. Men"   
+        value={form.category}
+        onChange={(e) => updateForm({ category: e.target.value })} />
+      </Form.Group>
+
+      <Form.Group className="mb-3  " controlId="formBasicPassword">
+        <Form.Label>Color</Form.Label>
+        <Form.Control  
+        type="text" 
+        placeholder="E.g. Brown"   
+        value={form.color}
+        onChange={(e) => updateForm({ color: e.target.value })} />
       </Form.Group>
 
       <Form.Group className="mb-3"  controlId="formBasicEmail">
@@ -79,18 +109,9 @@ const fileUpload = async (e) => {
         onChange={(e) => updateForm({ description: e.target.value })} />
       </Form.Group>
 
-      <Form.Group className="mb-3  " controlId="formBasicPassword">
-        <Form.Label>Upload Image</Form.Label>
-        <Form.Control 
-        type="file" 
-        name="imgFile" 
-        accept=".jpeg, .png, .jpg, .webp"
-        onChange={fileUpload} />
-      </Form.Group>
-
         <Form.Group className="mb-3">
         <Button className="form-control btn action_trigger" type="submit">
-        Post
+        {loadingAnim ? <LoadingAnim /> : "Post Item"}
       </Button>
         </Form.Group>
     </Form>

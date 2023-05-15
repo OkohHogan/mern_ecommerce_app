@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {Button, Form} from 'react-bootstrap/';
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import AlertModal from "./alertModal";
 
 const SignInForm = () => {
   const navigate = useNavigate();
@@ -9,7 +10,8 @@ const SignInForm = () => {
     email: "", 
     password: ""
   });
-
+  const [modalData, setModaldata] = useState({titleData:"", descData:""});
+  const [modalShow, setModalShow] = useState(false);
  function updateForm(value) { 
   return setForm((prev) => {
     return { ...prev, ...value };
@@ -19,7 +21,7 @@ const SignInForm = () => {
  async function handleSubmit(e) {
   e.preventDefault();
   const newItem = { ...form };
-  await fetch("http://localhost:5050/login", {
+  await fetch("https://nelly-ecommerce-app.onrender.com/login", {
     method: "POST",
     crossDomain: true,
     headers: {
@@ -32,24 +34,33 @@ const SignInForm = () => {
   .then((response) => response.json())
   .then((data) => {
     if(data === "error") {
-      window.alert("Invalid Login Details");
+    //  window.alert("Invalid Login Details");
+    setModaldata({
+      titleData: "Error",
+      descData: "Invalid Login Details",
+    }); 
       return;
     }
     if(data.status === "ok") { 
       window.localStorage.setItem("token", data.data);
       window.localStorage.setItem("loggedIn", true);
+      setModalShow(true)
       navigate("/")
       setForm({ 
         email: "", 
         password: ""
-      })
-    
+      });
+      setModaldata({
+        titleData: "Successful",
+        descData: "Login Successful",
+      });          
     }
   
   })
 }
 
   return (
+    <>
     <Form method="post">
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Email</Form.Label>
@@ -85,6 +96,13 @@ const SignInForm = () => {
       </Button>
         </Form.Group>
     </Form>
+    <AlertModal 
+       show={modalShow}
+      title={modalData.titleData}
+      desc={modalData.descData}
+      onHide={() => setModalShow(false)}
+    />
+    </>
   );
 }
 

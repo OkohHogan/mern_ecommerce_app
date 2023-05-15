@@ -31,6 +31,18 @@ recordRoutes.route("/cartCounter").get(function (req, res) {
     });
  });
 
+ recordRoutes.route("/wishlistcount").get(function (req, res) {
+  let db_connect = dbo.getDb("nelly_ecommerce_db");
+  db_connect
+    .collection("wishlist")
+    .find({})
+    .count(function(err, count) 
+    {
+        if (err) throw err;
+        res.json(count);
+    });
+ });
+
 
 recordRoutes.route("/categories").get(function (req, res) {
   let db_connect = dbo.getDb("nelly_ecommerce_db");
@@ -108,7 +120,9 @@ recordRoutes.route("/items/add").post(function (req, response) {
    title: req.body.title,
    price: req.body.price,
    upFile: req.body.upFile,
-   description: req.body.description
+   category: req.body.category,
+   color: req.body.color,
+   description: req.body.description,
  };
  db_connect.collection("products").insertOne(myobj, function (err, res) {
    if (err) throw err;
@@ -239,6 +253,8 @@ recordRoutes.route("/items/addToCart").post(function (req, response) {
     upFile: req.body.upFile,
     itemId: req.body.itemId,
     userid: req.body.userid,
+    category: req.body.category,
+    color: req.body.color,
     date: getDate,
   };
   db_connect.collection("cart").insertOne(myobj, function (err, res) {
@@ -257,6 +273,8 @@ recordRoutes.route("/items/addToCart").post(function (req, response) {
     upFile: req.body.upFile,
     itemId: req.body.itemId,
     userid: req.body.userid,
+    category: req.body.category,
+    color: req.body.color,
     date: getDate,
   };
   db_connect.collection("wishlist").insertOne(myobj, function (err, res) {

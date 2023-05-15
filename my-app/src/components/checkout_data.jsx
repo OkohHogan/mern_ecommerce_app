@@ -1,13 +1,14 @@
 import React, {useState, useEffect} from "react";
 import { Col, Row, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router";
+import LoadingSpinner from "./loader";
 
 const FetchCartItem = (props) => {  
     return (
         <>
 <div className="table_body">
         <Row>
-        <Col   xs={5} lg={5} sm={5} md={5} xl={5} xxl={5} >
+        <Col  xs={5} lg={5} sm={5} md={5} xl={5} xxl={5} >
             <Row>
                 <div className="col-sm-3">
                     <div className="img_box">
@@ -27,21 +28,21 @@ const FetchCartItem = (props) => {
         <Col xs={7} lg={7} sm={7} md={7} xl={7} xxl={7} >
             <div className="text_box">
                 <Row>
-                    <div className="col-sm-4">
-                        <div className="table_row">
+                <Col  xs={4} lg={4} sm={4} md={4} xl={4} xxl={4} >
+                <div className="table_row">
                             <span id="itemQty">2</span>
                         </div>
-                    </div>
-                    <div className="col-sm-4">
-                        <div className="table_row">
+                </Col>
+                <Col  xs={4} lg={4} sm={4} md={4} xl={4} xxl={4} >
+                <div className="table_row">
                             <span id="price">${props.price}</span>
                         </div>
-                    </div>
-                    <div className="col-sm-4">
-                        <div className="table_row">
+                </Col>
+                <Col  xs={4} lg={4} sm={4} md={4} xl={4} xxl={4} >
+                <div className="table_row">
                             <span id="totalCost">$848</span>
                         </div>
-                    </div>
+                </Col>
                 </Row>
             </div>
         </Col>
@@ -52,11 +53,12 @@ const FetchCartItem = (props) => {
 }
 
 const CheckoutData = () => {
-
     const [records, setRecords] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
      async function getRecords() {
-       const response = await fetch(`http://localhost:5050/cartItems`); 
+        setIsLoading(true);
+       const response = await fetch(`https://nelly-ecommerce-app.onrender.com/cartItems`); 
        if (!response.ok) {
          const message = `An error occurred: ${response.statusText}`;
          window.alert(message);
@@ -65,6 +67,7 @@ const CheckoutData = () => {
        if(response.ok) {
          const records = await response.json();
          setRecords(records);
+         setIsLoading(true);
        }
      }
      getRecords();
@@ -106,7 +109,7 @@ const CheckoutData = () => {
      async function onSubmit(e) {
       e.preventDefault();
       const newItem = { ...form };
-      await fetch("http://localhost:5050/items/order", {
+      await fetch("https://nelly-ecommerce-app.onrender.com/items/order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -146,29 +149,27 @@ const CheckoutData = () => {
                                    <Col xs={7} lg={7} sm={7} md={7} xl={7} xxl={7} >
                                         <div className="text_box">
                                            <Row>
-                                                <div className="col-sm-4">
-                                                    <div className="table_row">
-                                                        <span>Quantity</span>
+                                           <Col  xs={4} lg={4} sm={4} md={4} xl={4} xxl={4} >
+                                           <div className="table_row">
+                                                        <span>Qty</span>
                                                     </div>
-                                                </div>
-                                                <div className="col-sm-4">
-                                                    <div className="table_row">
-                                                        <span>Price</span>
+                                           </Col>
+                                           <Col  xs={4} lg={4} sm={4} md={4} xl={4} xxl={4} >
+                                           <div className="table_row">
+                                                        <span>Cost</span>
                                                     </div>
-                                                </div>
-                                                <div className="col-sm-4">
-                                                    <div className="table_row">
+                                           </Col>
+                                           <Col  xs={4} lg={4} sm={4} md={4} xl={4} xxl={4} >
+                                           <div className="table_row">
                                                         <span>Total</span>
                                                     </div>
-                                                </div>
+                                           </Col>
                                             </Row>
                                         </div>
                                     </Col>
                                 </Row>
                             </div>
-                            {recordList()}
-                         
-
+                            {isLoading ? <LoadingSpinner /> : recordList()}
                             <div className="items_total">
                                 <div className="text-end">
                                     <h2>Total: $120</h2>
@@ -178,7 +179,7 @@ const CheckoutData = () => {
                             <div className="item_form">
                                <Row>
                                <Col  xs={4} lg={4} sm={4} md={4} xl={4} xxl={4} ></Col>
-                               <Col  xs={4} lg={4} sm={4} md={4} xl={4} xxl={4} >
+                               <Col  xs={12} lg={4} sm={12} md={4} xl={4} xxl={4} >
                                     <div className="form_box">
                                     <h2>Delivery Address</h2>
                                         <Form method="post">

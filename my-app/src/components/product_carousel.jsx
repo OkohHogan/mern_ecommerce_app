@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Carousel from 'react-bootstrap/Carousel';
 import { useParams, useNavigate } from "react-router";
+import LoadingSpinner from './loader';
 
 
 function ControlledCarousel(props) {
@@ -12,11 +13,12 @@ function ControlledCarousel(props) {
   const params = useParams();
   const navigate = useNavigate();
   const [fetchRecord, setFetchRecord] = useState({image:"", title:""})
-  
+  const [isLoading, setIsLoading] = useState(false); 
   useEffect(() => {
     async function fetchData() {
+      setIsLoading(true)
       const id = params.id.toString();
-      const response = await fetch(`http://localhost:5050/item/${params.id.toString()}`);
+      const response = await fetch(`https://nelly-ecommerce-app.onrender.com/item/${params.id.toString()}`);
       const record = await response.json();
       if (!response.ok) {
         const message = `An error has occurred: ${response.statusText}`;
@@ -31,6 +33,7 @@ function ControlledCarousel(props) {
           title: titleRecord
         }
         setFetchRecord(getRecord)
+        setIsLoading(false)
       }  
       
       if (!record) {
@@ -45,11 +48,11 @@ function ControlledCarousel(props) {
   return (
     <Carousel activeIndex={index} onSelect={handleSelect} variant='dark'>
      <Carousel.Item>
-     <img
+     {isLoading ? <LoadingSpinner /> : <img
         className="d-block w-100"
         src={fetchRecord.image}
         alt={fetchRecord.title}
-      />
+      />} 
      </Carousel.Item>
     </Carousel>
   );

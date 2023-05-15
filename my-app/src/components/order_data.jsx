@@ -14,6 +14,13 @@ const FetchOrderData = (props) => {
                         </Col>
                         <Col xs={12} lg={10} sm={10} md={10} xl={10} xxl={10}>
                             <div className="text_box">
+                            <div className="details float-start">
+                            <p><b>Name:</b> {props.firstname} {props.lastname}</p>
+                                    <p><b>Color:</b> Brown - <b>Price:</b> ${props.price} X {props.qty}</p>
+                                    <p><b>Address</b> {props.address}</p>
+                                    <p><b>Phone: </b> <Link to={`tel:${props.phone}`}>{props.phone}</Link></p>
+                                </div>
+
                                 <div className="">
                                     <div className="cost float-end">
                                         <p className="price"><b>Order ID:</b> 583938483939</p>
@@ -28,12 +35,7 @@ const FetchOrderData = (props) => {
                                     </Link>        
                                     </div>
                                 </div>
-                                <div className="details">
-                                    <p><b>Color:</b> Brown - <b>Price:</b> ${props.price} X {props.qty}</p>
-                                    <p><b>Name:</b> {props.firstname} {props.lastname}</p>
-                                    <p><b>Address</b> {props.address}</p>
-                                    <p><b>Phone: </b> <Link to={`tel:${props.phone}`}>{props.phone}</Link></p>
-                                </div>
+                           
 
                             </div>
                         </Col>
@@ -48,7 +50,7 @@ const OrderData = () => {
         const [records, setRecords] = useState([]);
        useEffect(() => {
         async function getRecords() {
-          const response = await fetch(`http://localhost:5050/orders`);
+          const response = await fetch(`https://nelly-ecommerce-app.onrender.com/orders`);
       
           if (!response.ok) {
             const message = `An error occurred: ${response.statusText}`;

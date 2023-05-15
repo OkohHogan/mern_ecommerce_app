@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import CartBar from "./cart_menu";
 import cartToggle from "./cartToggleAction";
 import { useNavigate } from "react-router-dom";
+
 function NavCategories(data) {
   return (
     <> 
@@ -16,12 +17,14 @@ function NavCategories(data) {
 }
 
 function MainNav() {
+
+
   const navigate = useNavigate();
   const isLoggedIn = window.localStorage.getItem("loggedIn");
   const [records, setRecords] = useState([]);
   useEffect(() => {
    async function getRecords() {
-     const response = await fetch("http://localhost:5050/categories");
+     const response = await fetch("https://nelly-ecommerce-app.onrender.com/categories");
      if (!response.ok) {
        const message = `An error occurred: ${response.statusText}`;
        window.alert(message);
@@ -43,12 +46,10 @@ function MainNav() {
   window.localStorage.clear()
 }
 
-
-
  const [record, setRecord] = useState({email: "", username: ""});
  useEffect(() =>{
    function getUser() {
-     fetch("http://localhost:5050/success", {
+     fetch("https://nelly-ecommerce-app.onrender.com/success", {
      method: "POST",
      crossDomain: true,
      headers: {
@@ -80,7 +81,7 @@ function MainNav() {
  const [number, setNumber] = useState(null);
  useEffect(() => {
   async function getNumber() {
-    const response = await fetch(`http://localhost:5050/cartCounter`); 
+    const response = await fetch(`https://nelly-ecommerce-app.onrender.com/cartCounter`); 
     if (!response.ok) {
       const message = `An error occurred: ${response.statusText}`;
       window.alert(message);
@@ -95,15 +96,20 @@ function MainNav() {
   return;
 });
 
+const [addActiveState, setActiveState] = useState(true);
+const handleChange = () => {
+  return setActiveState(!addActiveState);
+};
 
   return (
     <>   
-     <CartBar  />
+     <CartBar  /> 
       <Container fluid className="main_nav">
       <Row>
         <Col sm={12} xl={4} lg={4} md={12} xs={12}>
         <div className="box">
-        <ul className="nav_items">
+        <Button className="toggleBtn" onClick={() => handleChange()}><FeatherIcon icon="menu" /></Button>
+        <ul className={addActiveState ? "nav_items" : "nav_items active"}>
           {records.map(NavCategories)}
         </ul>
         </div>
@@ -116,25 +122,24 @@ function MainNav() {
                     </Link>
           </div>
         </Col>
-        <Col sm={12} xl={4} lg={4} md={12} xs={12}>
-        <div className="box text-end">
-                    <ul>
-                        <li>
-                            <div className="chat_box">
-                                <div className="input-group">
-                                    <div className="input-group-append">
-                                  <span className="input-group-text" id="basic-addon2"> <FeatherIcon icon="search" /></span>
-                                     </div>
-                                   <input type="text" className="form-control input" placeholder="Search for items" aria-describedby="basic-addon2" />
-                                </div>
-                             </div>                             
-                        </li>
-                        <li>
+                        <Col sm={12} xl={4} lg={4} md={12} xs={12}>
+                        <div className="box text-end">
+                          <ul>
+                          <li>
+                          <div className="chat_box">
+                          <div className="input-group">
+                          <div className="input-group-append">
+                          <span className="input-group-text" id="basic-addon2"> <FeatherIcon icon="search" /></span>
+                          </div>
+                          <input type="text" className="form-control input" placeholder="Search for items" aria-describedby="basic-addon2" />
+                          </div>
+                          </div>                             
+                          </li>
+                          <li>
                           <Dropdown>
                           <Dropdown.Toggle id="dropdown-basic">
                           <FeatherIcon icon="user" />
                           </Dropdown.Toggle>
-
                           <Dropdown.Menu>
                           <Dropdown.Item >
                           <Link to={ isLoggedIn === "true" ? "/" : "/signin" } >
@@ -165,12 +170,49 @@ function MainNav() {
                             </Link>
                         </li>
                     </ul>
+            
+                </div>
+                <div className="mobileCart">
+                <Button className="cartToggleBtn">
+                  <div className="cart_counter">
+                  <div className="cart_num">{number}</div>
+                  </div>
+                  <Link onClick={cartToggle} className="cart_dropToggle">
+                  <FeatherIcon icon="shopping-bag" />
+                  </Link>
+                  </Button>
+                </div>
+                <div className="mobileDropdown">
+                <Dropdown>
+                          <Dropdown.Toggle id="dropdown-basic">
+                          <FeatherIcon icon="user" />
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu>
+                          <Dropdown.Item >
+                          <Link to={ isLoggedIn === "true" ? "/" : "/signin" } >
+                          { isLoggedIn === "true" ? "Hi " + record.username : "Sign-in" }
+                          </Link>
+                          </Dropdown.Item>
+                          <Dropdown.Divider />
+                          <Dropdown.Item ><Link to="/wishlist">Wishlist</Link></Dropdown.Item>
+                          <Dropdown.Divider />
+                          <Dropdown.Item ><Link to="/account">Account</Link></Dropdown.Item>
+                          <Dropdown.Divider />
+                          <Dropdown.Item ><Link to="/order-history">Order</Link></Dropdown.Item>
+                            {
+                              isLoggedIn === "true" ? 
+                              <>
+                              <Dropdown.Divider /> <Dropdown.Item> <Button onClick={onLogout}>Logout</Button>  </Dropdown.Item>
+                              </>:
+                              null
+                            }  
+                          </Dropdown.Menu>
+                          </Dropdown>
                 </div>
         </Col>
       </Row>
     </Container>
     </>
-
   );
 }
 

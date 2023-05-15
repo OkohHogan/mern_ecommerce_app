@@ -3,25 +3,32 @@ import { Accordion, Col, Row, Card } from "react-bootstrap";
 import FeatherIcon from "feather-icons-react/build/FeatherIcon";
 import { useParams, useNavigate } from "react-router";
 import {Button, Form} from "react-bootstrap";
+import LoadingAnim from "./loadinganim";
+import LoadingAnimBlack from "./loadingAnimBlack";
+import AlertModal from "./alertModal";
 
 const ProductDetails = () => {
     const params = useParams();
     const navigate = useNavigate();
-
     const isLoggedIn = window.localStorage.getItem("loggedIn");
-
     const  titleRef= useRef(null);
     const  priceRef = useRef(null);
     const  descRef = useRef(null);
     const  upFileRef = useRef(null);
     const  itemIdRef = useRef(null);
     const  userIdRef = useRef(null);
-    
+    const  categoryRef = useRef(null);
+    const  colorRef = useRef(null);
+    const [loadingAnim, setLoadingAnim] = useState(false);
+    const [loadingAnimBlack, setLoadingAnimBlack] = useState(false);
+    const [modalShow, setModalShow] = useState(false);
+    const [modalData, setModaldata] = useState({titleData: "", descData:""});
+
     const addToCart = async (e) => {
     if(isLoggedIn !== "true"){
         alert("Login or Register to add to continue shopping");
         return;    
-      } 
+    }
       else {
         e.preventDefault();
         const title = titleRef.current.value;
@@ -30,18 +37,33 @@ const ProductDetails = () => {
         const upFile = upFileRef.current.value;
         const itemId = itemIdRef.current.value;
         const userid = userIdRef.current.value;
+        const category = categoryRef.current.value;
+        const color = colorRef.current.value;
+        setLoadingAnim(true);
         let result = await fetch(
-        'http://localhost:5050/items/addToCart', {
+        'https://nelly-ecommerce-app.onrender.com/items/addToCart', {
             method: "POST",
-            body: JSON.stringify({ title, price, description, upFile, itemId, userid }),
+            body: JSON.stringify({ title, price, description, upFile, itemId, userid, category, color }),
             headers: {
                 'Content-Type': 'application/json'
             }
-        })
+        })       
         result = await result.json();
-        console.warn(result);
-        if (result) {
-            alert("Data saved succesfully");
+        if (result) {        
+            setModalShow(true);
+            setLoadingAnim(false);
+            setModaldata({
+              titleData: "Successful",
+              descData: "Item successfully added to cart",
+            })           
+        }
+        if(!result) {
+          setModalShow(true);
+          setLoadingAnim(false);
+          setModaldata({
+            titleData: "Error",
+            descData: "Error!! try adding item to cart again.",
+          }) 
         }
       }
     }
@@ -53,33 +75,48 @@ const ProductDetails = () => {
       } 
       else {
         e.preventDefault();
+        setLoadingAnimBlack(true)
         const title = titleRef.current.value;
         const price = priceRef.current.value;
         const description = descRef.current.value;
         const upFile = upFileRef.current.value;
         const itemId = itemIdRef.current.value;
         const userid = userIdRef.current.value;
+        const category = categoryRef.current.value;
+        const color = colorRef.current.value;
         let result = await fetch(
-        'http://localhost:5050/items/addToWishList', {
+        'https://nelly-ecommerce-app.onrender.com/items/addToWishList', {
             method: "POST",
-            body: JSON.stringify({ title, price, description, upFile, itemId, userid }),
+            body: JSON.stringify({ title, price, description, upFile, itemId, userid, category, color }),
             headers: {
                 'Content-Type': 'application/json'
             }
         })
         result = await result.json();
-        console.warn(result);
         if (result) {
-            alert("Data saved to wishlist succesfully");
+            setLoadingAnimBlack(false);
+            setModalShow(true);
+            setModaldata({
+              titleData: "Successful",
+              descData: "Item successfully added to wishlist",
+            }) 
+        }
+        if(!result) {
+          setModalShow(true);
+          setLoadingAnim(false);
+          setModaldata({
+            titleData: "Error",
+            descData: "Error!! Try adding item to wishlist again.",
+          }) 
         }
       }
     }       
 
-    const [fetchRecord, setFetchRecord] = useState({title: "", price: "", _id: ""})    
+    const [fetchRecord, setFetchRecord] = useState({title: "", price: "", _id: "", category: "", color: ""})    
     useEffect(() => {
         async function fetchData() {
         const id = params.id.toString();
-        const response = await fetch(`http://localhost:5050/item/${params.id.toString()}`);
+        const response = await fetch(`https://nelly-ecommerce-app.onrender.com/item/${params.id.toString()}`);
         const record = await response.json();
         if (!response.ok) {
           const message = `An error has occurred: ${response.statusText}`;
@@ -103,7 +140,7 @@ const ProductDetails = () => {
     const [getToken, setToken] = useState({email: "", username: "", userID: ""});
     useEffect(() =>{
       function getUserData() {
-        fetch("http://localhost:5050/success", {
+        fetch("https://nelly-ecommerce-app.onrender.com/success", {
         method: "POST",
         crossDomain: true,
         headers: {
@@ -135,10 +172,13 @@ const ProductDetails = () => {
 
 
     return (
+      
         <div className="prod_details">
             <div className="itemDetails">
-            <span>Leather Women Bag</span>  
-            <span className="float-end">{fetchRecord._id}</span> 
+            <span className="float-end">{fetchRecord._id}</span>
+            <span>Category: <b>{fetchRecord.category}</b></span> <br></br>
+            <span>Color: <b>{fetchRecord.color}</b></span>   
+            
             <h2>{fetchRecord.title}</h2>
             <h3>${fetchRecord.price} </h3>
             </div>
@@ -227,7 +267,7 @@ const ProductDetails = () => {
 
     <div className="action_btns">
     <Row>
-        <Col xs={11} sm={11} xxl={11} xl={11} md={11} lg={11}>
+        <Col xs={6}  sm={6} xxl={6} xl={6} md={6} lg={6}>
         <Form >
       <Form.Group className="mb-3" hidden  controlId="formBasicEmail">
         <Form.Label>Title</Form.Label>
@@ -262,6 +302,28 @@ const ProductDetails = () => {
         />
       </Form.Group>
 
+   <Form.Group className="mb-3" hidden  controlId="formBasicPassword">
+        <Form.Label>Category</Form.Label>
+        <Form.Control  
+        type="text" 
+        placeholder="" 
+        readOnly  
+       defaultValue={fetchRecord.category}
+       ref={categoryRef}
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3" hidden  controlId="formBasicPassword">
+        <Form.Label>Color</Form.Label>
+        <Form.Control  
+        type="text" 
+        placeholder="" 
+        readOnly  
+       defaultValue={fetchRecord.color}
+       ref={colorRef}
+        />
+      </Form.Group>
+
       <Form.Group className="mb-3" hidden   controlId="formBasicPassword">
         <Form.Label>user Id</Form.Label>
         <Form.Control  
@@ -271,7 +333,7 @@ const ProductDetails = () => {
        defaultValue={getToken.userID}
        ref={userIdRef}
         />
-      </Form.Group>
+      </Form.Group>  
 
       <Form.Group className="mb-3" hidden  controlId="formBasicEmail">
         <Form.Label>Item Description</Form.Label>
@@ -298,11 +360,11 @@ const ProductDetails = () => {
        ref={upFileRef}
          />
       </Form.Group>
-      <Button onClick={addToCart} type="submit" className="form-control btn submit_trigger">Add to Bag</Button>
+      <Button onClick={addToCart} type="submit" className="form-control btn submit_trigger">{loadingAnim ? <LoadingAnim /> : "Add to Bag"}</Button>
     </Form>         
         </Col>
 
-        <Col  xs={1} sm={1} xxl={1} xl={1} md={1} lg={1}>
+        <Col  xs={6} sm={6} xxl={6} xl={6} md={6} lg={6}>
         <Form >
       <Form.Group className="mb-3" hidden  controlId="formBasicEmail">
         <Form.Label>Title</Form.Label>
@@ -334,6 +396,28 @@ const ProductDetails = () => {
         readOnly  
        defaultValue={fetchRecord._id}
        ref={itemIdRef}
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3" hidden  controlId="formBasicPassword">
+        <Form.Label>Category</Form.Label>
+        <Form.Control  
+        type="text" 
+        placeholder="" 
+        readOnly  
+       defaultValue={fetchRecord.category}
+       ref={categoryRef}
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3" hidden  controlId="formBasicPassword">
+        <Form.Label>Color</Form.Label>
+        <Form.Control  
+        type="text" 
+        placeholder="" 
+        readOnly  
+       defaultValue={fetchRecord.color}
+       ref={colorRef}
         />
       </Form.Group>
 
@@ -373,11 +457,19 @@ const ProductDetails = () => {
        ref={upFileRef}
          />
       </Form.Group>
-      <Button onClick={addToWishList} type="submit" className="fav_action btn text-center"><FeatherIcon icon="heart" /></Button>
+      <Button onClick={addToWishList} type="submit" className="fav_action btn form-control ">
+       {loadingAnimBlack ? <LoadingAnimBlack /> : " Add to Wishlist"}
+      </Button>
     </Form> 
         </Col>
     </Row>
     </div>
+      <AlertModal
+      show={modalShow}
+      title={modalData.titleData}
+      desc={modalData.descData}
+      onHide={() => setModalShow(false)}
+      />
     </div>
     )
 }
